@@ -1,79 +1,60 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import { FiMenu, FiX } from 'react-icons/fi';
-import { motion } from 'framer-motion';
+import { ToolSearch } from './tools/ToolSearch';
+import { ThemeToggle } from './ThemeToggle';
+import { activeTools } from '@/config/tools';
+
+const navItems = [
+  { label: 'Tools', href: '/tools' },
+  { label: 'Data', href: '/tools/json' },
+  { label: 'Networking', href: '/tools/network' },
+  { label: 'Security', href: '/tools/security' },
+  { label: 'Guides', href: '/docs' },
+  { label: 'Blog', href: '/blog' },
+];
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-
-  const navItems = [
-    { label: 'Home', href: '/' },
-    { label: 'Products', href: '/products' },
-    { label: 'Blog', href: '/blog' },
-    { label: 'Tools', href: '/tools' },
-    { label: 'Docs', href: '/docs' },
-  ];
-
   return (
-    <nav className="sticky top-0 z-50 bg-dark/95 backdrop-blur border-b border-gray-700">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="text-2xl">🦆</div>
-            <span className="text-xl font-bold text-gradient">Duck Cloud</span>
-          </Link>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="text-gray-300 hover:text-primary transition-colors duration-300 font-medium"
-              >
-                {item.label}
-              </Link>
-            ))}
-            <Link href="/products">
-              <button className="btn-primary">Get Started</button>
-            </Link>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden text-primary"
-            onClick={() => setIsOpen(!isOpen)}
-            aria-label="Toggle menu"
-          >
-            {isOpen ? <FiX size={24} /> : <FiMenu size={24} />}
-          </button>
+    <header className="site-header">
+      <nav aria-label="Primary" className="page-container flex min-h-16 items-center gap-5">
+        <Link href="/" className="brand-link" aria-label="Duck Cloud home">
+          <Image src="/assets/logo/favicon-32x32.png" alt="" width={32} height={32} priority />
+          <span>Duck Cloud</span>
+        </Link>
+        <div className="hidden flex-1 items-center justify-center gap-1 lg:flex">
+          {navItems.map((item) => (
+            <Link key={item.label} href={item.href} className="nav-link">{item.label}</Link>
+          ))}
         </div>
-
-        {/* Mobile Navigation */}
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="md:hidden pb-4 space-y-2"
-          >
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="block px-4 py-2 text-gray-300 hover:text-primary hover:bg-secondary/50 rounded transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                {item.label}
-              </Link>
-            ))}
-            <button className="w-full btn-primary mt-4">Get Started</button>
-          </motion.div>
-        )}
-      </div>
-    </nav>
+        <div className="ml-auto hidden items-center gap-3 md:flex">
+          <ToolSearch tools={activeTools} compact />
+          <ThemeToggle compact />
+        </div>
+        <button
+          type="button"
+          className="mobile-menu-button ml-auto md:hidden"
+          onClick={() => setIsOpen((value) => !value)}
+          aria-expanded={isOpen}
+          aria-controls="mobile-nav"
+          aria-label="Toggle navigation"
+        >
+          {isOpen ? <FiX size={22} /> : <FiMenu size={22} />}
+        </button>
+      </nav>
+      {isOpen && (
+        <div id="mobile-nav" className="page-container mobile-nav md:hidden">
+          <ToolSearch tools={activeTools} compact />
+          <div className="py-2"><ThemeToggle /></div>
+          {navItems.map((item) => (
+            <Link onClick={() => setIsOpen(false)} key={item.label} href={item.href} className="nav-link block">{item.label}</Link>
+          ))}
+        </div>
+      )}
+    </header>
   );
 };
